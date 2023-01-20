@@ -11,17 +11,8 @@ class CGMSteamUtilsCallbacks
 {
 public:
 
-	STEAM_CALLBACK(CGMSteamUtilsCallbacks, on_floating_gamepad_text_input_dismissed, FloatingGamepadTextInputDismissed_t);
-
 	STEAM_CALLBACK(CGMSteamUtilsCallbacks, on_gamepad_text_input_dismissed, GamepadTextInputDismissed_t);
 };
-
-void CGMSteamUtilsCallbacks::on_floating_gamepad_text_input_dismissed(FloatingGamepadTextInputDismissed_t* pParam)
-{
-	int map = CreateDsMap(0, 0);
-	DsMapAddString(map, "event_type", "floating_gamepad_text_input_dismissed");
-	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
-}
 
 void CGMSteamUtilsCallbacks::on_gamepad_text_input_dismissed(GamepadTextInputDismissed_t* pParam)
 {
@@ -96,13 +87,7 @@ YYEXPORT void steam_show_floating_gamepad_text_input(RValue& Result, CInstance* 
 		return;
 	}
 
-	Result.val = SteamUtils()->ShowFloatingGamepadTextInput(
-		static_cast<EFloatingGamepadTextInputMode>(YYGetInt32(arg, 0)),
-		YYGetInt32(arg, 1),
-		YYGetInt32(arg, 2),
-		YYGetInt32(arg, 3),
-		YYGetInt32(arg, 4)
-	);
+	Result.val = 0;
 }
 
 /// ()->bool
@@ -116,7 +101,7 @@ YYEXPORT void steam_dismiss_floating_gamepad_text_input(RValue& Result, CInstanc
 		return;
 	}
 
-	Result.val = SteamUtils()->DismissFloatingGamepadTextInput();
+	Result.val = 0;
 }
 
 /// (mode:gamepad_text_input_mode,lines_mode:gamepad_text_input_line_mode,description:string,chars_max:real,existing_text:string)->bool
@@ -182,5 +167,5 @@ YYEXPORT void steam_utils_is_steam_running_on_steam_deck(RValue& Result, CInstan
 		return;
 	}
 
-	Result.val = SteamUtils()->IsSteamRunningOnSteamDeck();
+	Result.val = 0;
 }

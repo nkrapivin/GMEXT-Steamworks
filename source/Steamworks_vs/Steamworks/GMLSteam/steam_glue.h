@@ -18,7 +18,7 @@
 
 // For unidentifiable reason Steam API doesn't init unless using "safe" interfaces.
 // Might be a conflict with GM runtime.
-#define VERSION_SAFE_STEAM_API_INTERFACES 1
+//#define VERSION_SAFE_STEAM_API_INTERFACES 1
 #include "steam_api.h"
 #include "isteamappticket.h"
 

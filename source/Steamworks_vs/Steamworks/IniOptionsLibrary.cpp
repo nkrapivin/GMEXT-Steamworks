@@ -84,8 +84,8 @@ std::string IniOptions_read(std::string extensionName, std::string key)
 
 	std::string str = readFile(optionsIniPath);
 
-	int start;
-	int end;
+	int start = 0;
+	int end = 0;
 	segmentation(str,extensionName, key, start, end);
 
 	for (int i = start; i < end ; i++)

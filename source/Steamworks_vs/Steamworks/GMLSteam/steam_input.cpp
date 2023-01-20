@@ -4,7 +4,6 @@
 #include "Extension_Interface.h"
 #include "YYRValue.h"
 #include "steam_common.h"
-#include "isteamdualsense.h"
 
 // some notes on types:
 // string - a gamemaker string
@@ -67,73 +66,7 @@ class CGMSteamInputCallbacks
 
 public:
 
-	STEAM_CALLBACK(CGMSteamInputCallbacks, on_steam_input_configuration_loaded, SteamInputConfigurationLoaded_t);
-
-	STEAM_CALLBACK(CGMSteamInputCallbacks, on_steam_input_device_connected, SteamInputDeviceConnected_t);
-
-	STEAM_CALLBACK(CGMSteamInputCallbacks, on_steam_input_device_disconnected, SteamInputDeviceDisconnected_t);
-
-	static void on_steam_input_action_event(SteamInputActionEvent_t* pParam);
 };
-
-void CGMSteamInputCallbacks::on_steam_input_configuration_loaded(SteamInputConfigurationLoaded_t* pParam)
-{
-	int map = CreateDsMap(0,0);
-	DsMapAddString(map, "event_type", "steam_input_configuration_loaded");
-	DsMapAddDouble(map, "app_id", static_cast<double>(pParam->m_unAppID));
-	DsMapAddInt64(map, "device_handle", static_cast<int64>(pParam->m_ulDeviceHandle));
-	DsMapAddInt64(map, "mapping_creator", static_cast<int64>(pParam->m_ulMappingCreator.ConvertToUint64()));
-	DsMapAddDouble(map, "major_revision", static_cast<double>(pParam->m_unMajorRevision));
-	DsMapAddDouble(map, "minor_revision", static_cast<double>(pParam->m_unMinorRevision));
-	DsMapAddBool(map, "uses_steam_input_api", pParam->m_bUsesSteamInputAPI);
-	DsMapAddBool(map, "uses_steam_gamepad_api", pParam->m_bUsesGamepadAPI);
-	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
-}
-
-void CGMSteamInputCallbacks::on_steam_input_device_connected(SteamInputDeviceConnected_t* pParam)
-{
-	int map = CreateDsMap(0,0);
-	DsMapAddString(map, "event_type", "steam_input_device_connected");
-	DsMapAddInt64(map, "connected_device_handle", static_cast<int64>(pParam->m_ulConnectedDeviceHandle));
-	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
-}
-
-void CGMSteamInputCallbacks::on_steam_input_device_disconnected(SteamInputDeviceDisconnected_t* pParam)
-{
-	int map = CreateDsMap(0,0);
-	DsMapAddString(map, "event_type", "steam_input_device_disconnected");
-	DsMapAddInt64(map, "disconnected_device_handle", static_cast<int64>(pParam->m_ulDisconnectedDeviceHandle));
-	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
-}
-
-void CGMSteamInputCallbacks::on_steam_input_action_event(SteamInputActionEvent_t* pParam)
-{
-	int map = CreateDsMap(0,0);
-	DsMapAddString(map, "event_type", "steam_input_action_event");
-	DsMapAddInt64(map, "controller_handle", static_cast<int64>(pParam->controllerHandle));
-	DsMapAddDouble(map, "action_event_type", static_cast<double>(pParam->eEventType));
-	switch (pParam->eEventType)
-	{
-		case ESteamInputActionEventType_DigitalAction:
-		{
-			DsMapAddInt64(map, "action_handle", static_cast<int64>(pParam->digitalAction.actionHandle));
-			DsMapAddBool(map, "active", pParam->digitalAction.digitalActionData.bActive);
-			DsMapAddBool(map, "state", pParam->digitalAction.digitalActionData.bState);
-			break;
-		}
-
-		case ESteamInputActionEventType_AnalogAction:
-		{
-			DsMapAddInt64(map, "action_handle", static_cast<int64>(pParam->analogAction.actionHandle));
-			DsMapAddDouble(map, "mode", pParam->analogAction.analogActionData.eMode);
-			DsMapAddDouble(map, "x", pParam->analogAction.analogActionData.x);
-			DsMapAddDouble(map, "y", pParam->analogAction.analogActionData.y);
-			DsMapAddBool(map, "active", pParam->analogAction.analogActionData.bActive);
-			break;
-		}
-	}
-	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
-}
 
 // only instantiate this class if we've called SteamInput->Init()
 // and we actually want native Steam Input,
@@ -173,7 +106,7 @@ YYEXPORT void steam_input_init(RValue& Result, CInstance* selfinst, CInstance* o
 		DebugConsoleOutput("Steam Input callbacks CONFIGURED \n ");
 	}
 
-	Result.val = API->Init(expCallRunFrame);
+	Result.val = API->Init();
 }
 
 /// ()->bool
@@ -203,7 +136,7 @@ YYEXPORT void steam_input_set_input_action_manifest_file_path(RValue& Result, CI
 		return;
 	}
 
-	Result.val = API->SetInputActionManifestFilePath(absolutePath);
+	Result.val = 0;
 }
 
 /// ()->bool
@@ -237,7 +170,7 @@ YYEXPORT void steam_input_wait_for_data(RValue& Result, CInstance* selfinst, CIn
 		return;
 	}
 
-	Result.val = API->BWaitForData(waitForever, timeout);
+	Result.val = 0;
 }
 
 /// ()->bool
@@ -250,7 +183,7 @@ YYEXPORT void steam_input_new_data_available(RValue& Result, CInstance* selfinst
 		return;
 	}
 
-	Result.val = API->BNewDataAvailable();
+	Result.val = 0;
 }
 
 /// ()->array<input_handle>
@@ -294,7 +227,6 @@ YYEXPORT void steam_input_enable_device_callbacks(RValue& Result, CInstance* sel
 	}
 
 	Result.val = 1.0;
-	API->EnableDeviceCallbacks();
 }
 
 /// ()->bool
@@ -310,7 +242,6 @@ YYEXPORT void steam_input_enable_action_event_callbacks(RValue& Result, CInstanc
 	}
 
 	Result.val = 1.0;
-	API->EnableActionEventCallbacks(&CGMSteamInputCallbacks::on_steam_input_action_event);
 }
 
 /// (action_set_name:string)->action_set_handle
@@ -529,7 +460,7 @@ YYEXPORT void steam_input_get_string_for_digital_action_name(RValue& Result, CIn
 		return;
 	}
 
-	YYCreateString(&Result, API->GetStringForDigitalActionName(daction));
+	YYCreateString(&Result, "");
 }
 
 /// (analog_action_name:string)->analog_action_handle
@@ -604,7 +535,6 @@ YYEXPORT void steam_input_get_glyph_png_for_action_origin(RValue& Result, CInsta
 	steam_input_ensure_argc(3);
 
 	EInputActionOrigin origin = static_cast<EInputActionOrigin>(YYGetInt32(arg, 0));
-	ESteamInputGlyphSize orsiz = static_cast<ESteamInputGlyphSize>(YYGetInt32(arg, 1));
 	uint32 flags = YYGetUint32(arg, 2);
 
 	if (!steam_is_initialised || !API)
@@ -613,12 +543,7 @@ YYEXPORT void steam_input_get_glyph_png_for_action_origin(RValue& Result, CInsta
 		return;
 	}
 
-	const char* path = API->GetGlyphPNGForActionOrigin(origin, orsiz, flags);
-	if (path && *path)
-	{
-		AddFileToSaveWhitelist(path);
-	}
-	YYCreateString(&Result, path);
+	YYCreateString(&Result, "");
 }
 
 /// (origin:action_origin,flags:glyph_style)->string
@@ -635,12 +560,7 @@ YYEXPORT void steam_input_get_glyph_svg_for_action_origin(RValue& Result, CInsta
 		return;
 	}
 
-	const char* path = API->GetGlyphSVGForActionOrigin(origin, flags);
-	if (path && *path)
-	{
-		AddFileToSaveWhitelist(path);
-	}
-	YYCreateString(&Result, path);
+	YYCreateString(&Result, "");
 }
 
 /// (origin:action_origin)->string
@@ -656,7 +576,7 @@ YYEXPORT void steam_input_get_glyph_for_action_origin_legacy(RValue& Result, CIn
 		return;
 	}
 
-	const char* path = API->GetGlyphForActionOrigin_Legacy(origin);
+	const char* path = API->GetGlyphForActionOrigin(origin);
 	if (path && *path)
 	{
 		AddFileToSaveWhitelist(path);
@@ -693,7 +613,7 @@ YYEXPORT void steam_input_get_string_for_analog_action_name(RValue& Result, CIns
 		return;
 	}
 
-	YYCreateString(&Result, API->GetStringForAnalogActionName(aah));
+	YYCreateString(&Result, "");
 }
 
 /// (controller:input_handle,action:analog_action_handle)->bool
@@ -781,7 +701,6 @@ YYEXPORT void steam_input_trigger_vibration_extended(RValue& Result, CInstance* 
 	}
 
 	Result.val = 1;
-	API->TriggerVibrationExtended(con, leftspeed, rightspeed, ltspeed, rtspeed);
 }
 
 /// (controller:input_handle,location:controller_haptic_location,intensity:real,gain_db:real,other_intensity:real,other_gain_db:real)->bool
@@ -789,22 +708,7 @@ YYEXPORT void steam_input_trigger_simple_haptic_event(RValue& Result, CInstance*
 {
 	steam_input_ensure_argc(6);
 
-	InputHandle_t con = static_cast<InputHandle_t>(YYGetInt64(arg, 0));
-	EControllerHapticLocation echl = static_cast<EControllerHapticLocation>(YYGetInt32(arg, 1));
-	uint8 intensity = static_cast<uint8>(YYGetInt32(arg, 2));
-	int8 gaindb = static_cast<int8>(YYGetInt32(arg, 3));
-	uint8 otherintensity = static_cast<uint8>(YYGetInt32(arg, 4));
-	int8 othergaindb = static_cast<int8>(YYGetInt32(arg, 5));
-
-	Result.kind = VALUE_BOOL;
-	if (!steam_is_initialised || !API)
-	{
-		Result.val = 0;
-		return;
-	}
-
-	Result.val = 1;
-	API->TriggerSimpleHapticEvent(con, echl, intensity, gaindb, otherintensity, othergaindb);
+	Result.val = 0;
 }
 
 /// (controller:input_handle,color:color,flags:led_flag)->bool
@@ -845,7 +749,7 @@ YYEXPORT void steam_input_trigger_haptic_pulse_legacy(RValue& Result, CInstance*
 	}
 
 	Result.val = 1;
-	API->Legacy_TriggerHapticPulse(con, pad, duration);
+	API->TriggerHapticPulse(con, pad, duration);
 }
 
 /// (controller:input_handle,pad:steam_controller_pad,duration_in_mcs:real,offset_in_mcs:real,repeats_amount:real,flags:real)->bool
@@ -868,7 +772,7 @@ YYEXPORT void steam_input_trigger_repeated_haptic_pulse_legacy(RValue& Result, C
 	}
 
 	Result.val = 1;
-	API->Legacy_TriggerRepeatedHapticPulse(con, pad, duration, offms, rep, flags);
+	API->TriggerRepeatedHapticPulse(con, pad, duration, offms, rep, flags);
 }
 
 /// (controller:input_handle)->bool
@@ -1063,7 +967,7 @@ YYEXPORT void steam_input_get_session_input_configuration_settings(RValue& Resul
 		return;
 	}
 
-	Result.val = API->GetSessionInputConfigurationSettings();
+	Result.val = 0;
 }
 
 static int steam_input_struct_get_i32(RValue* rparam, const char* name)
@@ -1119,99 +1023,6 @@ YYEXPORT void steam_input_set_dualsense_trigger_effect(RValue& Result, CInstance
 
 	InputHandle_t con = static_cast<InputHandle_t>(YYGetInt64(arg, 0));
 	RValue* rparam = YYGetStruct(arg, 1);
-	ScePadTriggerEffectParam param = { 0 };
-
-	Result.kind = VALUE_BOOL;
-	if (!steam_is_initialised || !API)
-	{
-		Result.val = 0;
-		return;
-	}
-
-	param.triggerMask = static_cast<uint8_t>(steam_input_struct_get_i32(rparam, "trigger_mask"));
-	// questionable land begin:
-	RValue* command_array = steam_input_struct_get_inner(rparam, "command", true);
-	for (int i = 0; i < SCE_PAD_TRIGGER_EFFECT_TRIGGER_NUM; ++i)
-	{
-		// not a pointer
-		RValue command_item = steam_input_struct_get_array(command_array, i);
-		param.command[i].mode = static_cast<ScePadTriggerEffectMode>(steam_input_struct_get_i32(&command_item, "mode"));
-		RValue* command_data = steam_input_struct_get_inner(&command_item, "command_data", false);
-		switch (param.command[i].mode)
-		{
-			case SCE_PAD_TRIGGER_EFFECT_MODE_FEEDBACK:
-			{
-				RValue* feedback_param = steam_input_struct_get_inner(command_data, "feedback_param", false);
-				param.command[i].commandData.feedbackParam.position = static_cast<uint8_t>(steam_input_struct_get_i32(feedback_param, "position"));
-				param.command[i].commandData.feedbackParam.strength = static_cast<uint8_t>(steam_input_struct_get_i32(feedback_param, "strength"));
-				break;
-			}
-
-			case SCE_PAD_TRIGGER_EFFECT_MODE_WEAPON:
-			{
-				RValue* weapon_param = steam_input_struct_get_inner(command_data, "weapon_param", false);
-				param.command[i].commandData.weaponParam.startPosition = static_cast<uint8_t>(steam_input_struct_get_i32(weapon_param, "start_position"));
-				param.command[i].commandData.weaponParam.endPosition = static_cast<uint8_t>(steam_input_struct_get_i32(weapon_param, "end_position"));
-				param.command[i].commandData.weaponParam.strength = static_cast<uint8_t>(steam_input_struct_get_i32(weapon_param, "strength"));
-				break;
-			}
-
-			case SCE_PAD_TRIGGER_EFFECT_MODE_VIBRATION:
-			{
-				RValue* vibration_param = steam_input_struct_get_inner(command_data, "vibration_param", false);
-				param.command[i].commandData.vibrationParam.amplitude = static_cast<uint8_t>(steam_input_struct_get_i32(vibration_param, "amplitude"));
-				param.command[i].commandData.vibrationParam.frequency = static_cast<uint8_t>(steam_input_struct_get_i32(vibration_param, "frequency"));
-				param.command[i].commandData.vibrationParam.position = static_cast<uint8_t>(steam_input_struct_get_i32(vibration_param, "position"));
-				break;
-			}
-
-			case SCE_PAD_TRIGGER_EFFECT_MODE_MULTIPLE_POSITION_FEEDBACK:
-			{
-				RValue* multiple_position_feedback_param = steam_input_struct_get_inner(command_data, "multiple_position_feedback_param", false);
-				RValue* strength = steam_input_struct_get_inner(multiple_position_feedback_param, "strength", true);
-				for (int mi = 0; mi < SCE_PAD_TRIGGER_EFFECT_CONTROL_POINT_NUM; ++mi)
-				{
-					RValue tmp = steam_input_struct_get_array(strength, mi);
-					param.command[i].commandData.multiplePositionFeedbackParam.strength[mi] = static_cast<uint8_t>(YYGetInt32(&tmp, 0));
-					FREE_RValue(&tmp);
-				}
-				break;
-			}
-
-			case SCE_PAD_TRIGGER_EFFECT_MODE_SLOPE_FEEDBACK:
-			{
-				RValue* slope_feedback_param = steam_input_struct_get_inner(command_data, "slope_feedback_param", false);
-				param.command[i].commandData.slopeFeedbackParam.startPosition = static_cast<uint8_t>(steam_input_struct_get_i32(slope_feedback_param, "start_position"));
-				param.command[i].commandData.slopeFeedbackParam.endPosition = static_cast<uint8_t>(steam_input_struct_get_i32(slope_feedback_param, "end_position"));
-				param.command[i].commandData.slopeFeedbackParam.startStrength = static_cast<uint8_t>(steam_input_struct_get_i32(slope_feedback_param, "start_strength"));
-				param.command[i].commandData.slopeFeedbackParam.endStrength = static_cast<uint8_t>(steam_input_struct_get_i32(slope_feedback_param, "end_strength"));
-				break;
-			}
-
-			case SCE_PAD_TRIGGER_EFFECT_MODE_MULTIPLE_POSITION_VIBRATION:
-			{
-				RValue* multiple_position_vibration_param = steam_input_struct_get_inner(command_data, "multiple_position_vibration_param", false);
-				param.command[i].commandData.multiplePositionVibrationParam.frequency = static_cast<uint8_t>(steam_input_struct_get_i32(multiple_position_vibration_param, "frequency"));
-				RValue* amplitude = steam_input_struct_get_inner(multiple_position_vibration_param, "amplitude", true);
-				for (int mi = 0; mi < SCE_PAD_TRIGGER_EFFECT_CONTROL_POINT_NUM; ++mi)
-				{
-					RValue tmp = steam_input_struct_get_array(amplitude, mi);
-					param.command[i].commandData.multiplePositionVibrationParam.amplitude[mi] = static_cast<uint8_t>(YYGetInt32(&tmp, 0));
-					FREE_RValue(&tmp);
-				}
-				break;
-			}
-
-			default:
-			{
-				// _OFF mode? don't read anything inside command_data...
-				break;
-			}
-		}
-		FREE_RValue(&command_item);
-	}
-	// questionable land leave:
 
 	Result.val = 1;
-	API->SetDualSenseTriggerEffect(con, &param);
 }
