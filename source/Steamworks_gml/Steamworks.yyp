@@ -140,6 +140,6 @@
     {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"Steamworks_Extension_Documentation.html","CopyToMask":0,"filePath":"datafiles",},
   ],
   "MetaData": {
-    "IDEVersion": "2022.900.0.39",
+    "IDEVersion": "2022.0.0.19",
   },
 }
