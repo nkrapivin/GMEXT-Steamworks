@@ -51,9 +51,176 @@ YYEXPORT void steam_init(RValue& Result, CInstance* selfinst, CInstance* otherin
 	Result.val = 1;
 }
 
+#include <unordered_map>
+
+using IniString = std::string;
+using IniSection = std::unordered_map<IniString, IniString>;
+using IniFile = std::unordered_map<IniString, IniSection>;
+
+#ifdef _WIN32
+HINSTANCE hDLLInstance(nullptr);
+LPWSTR DllDirectory(nullptr);
+VOID ObtainDllDirectory(VOID) {
+	WCHAR pathbuff[8100] = { L'\0' };
+	DWORD wlen = GetModuleFileNameW(hDLLInstance, pathbuff, (sizeof(pathbuff) / sizeof(pathbuff[0])) - 1);
+	size_t idx = 0;
+	if (wlen > 0) {
+		for (idx = static_cast<size_t>(wlen) - 1; idx != 0; --idx) {
+			if (pathbuff[idx] == L'\\') {
+				pathbuff[idx + 1] = L'\0';
+				break;
+			}
+		}
+		DllDirectory = _wcsdup(pathbuff);
+	}
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+	if (fdwReason == DLL_PROCESS_ATTACH) {
+		hDLLInstance = hinstDLL;
+		ObtainDllDirectory();
+	}
+
+	return TRUE;
+}
+#endif
+
+std::string getOptionsIni() {
+	std::string optionsini;
+#ifdef _WIN32
+	WCHAR wcPathBuff[8100] = { L'\0' };
+	wcscpy_s(wcPathBuff, DllDirectory);
+	wcscat_s(wcPathBuff, L"options.ini");
+	HANDLE hFile = CreateFileW(wcPathBuff, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile) {
+		LARGE_INTEGER liFileSize = { 0 };
+		if (GetFileSizeEx(hFile, &liFileSize)) {
+			DWORD dwRead = 0;
+			optionsini.resize(static_cast<size_t>(liFileSize.QuadPart));
+			if (!ReadFile(hFile, const_cast<char*>(optionsini.data()), static_cast<DWORD>(liFileSize.QuadPart), &dwRead, nullptr)) {
+				tracef("Failed to read options.ini!\n");
+			}
+		}
+		CloseHandle(hFile);
+	}
+#else
+#ifdef __APPLE__
+	/* TODO: Implement macOS options.ini support here! */
+#else
+	Dl_info dlinf = { 0 };
+	if (dladdr(reinterpret_cast<void*>(&getOptionsIni), &dlinf)) {
+		tracef(".so path is %s\n", dlinf.dli_fname);
+
+		std::string s(dlinf.dli_fname);
+		if (s.length()) {
+			for (size_t idx = s.length() - 1; idx != 0; --idx) {
+				if (s[idx] == '/') {
+					s = s.substr(0, idx + 1);
+					break;
+				}
+			}
+
+			s += "options.ini";
+			tracef("options.ini path is %s\n", s.c_str());
+			FILE* f = fopen(s.c_str(), "rb");
+			if (f) {
+				fseek(f, 0, SEEK_END);
+				size_t fsiz = static_cast<size_t>(ftell(f));
+				fseek(f, 0, SEEK_SET);
+				optionsini.resize(fsiz);
+				fread(const_cast<char*>(optionsini.data()), 1, fsiz, f);
+				fclose(f);
+				tracef("options.ini read OK\n");
+			}
+		}
+	}
+#endif
+#endif
+	return optionsini;
+}
+
+std::string trimString(const std::string& inp) {
+	std::string out(inp);
+
+	if (out.empty())
+		return out;
+
+	for (std::string::iterator i = out.begin(); i != out.end();) {
+		char c(*i);
+		if (c == ' ' || c == '\t' || c == '\r') {
+			i = out.erase(i);
+		}
+		else {
+			break;
+		}
+	}
+
+	for (std::string::reverse_iterator i = out.rbegin(); i != out.rend();) {
+		char c(*i);
+		if (c == ' ' || c == '\t' || c == '\r') {
+			i = std::string::reverse_iterator(out.erase(std::next(i).base()));
+		}
+		else {
+			break;
+		}
+	}
+
+	return out;
+}
+
+IniFile parseIniFromString() {
+	std::stringstream sstr(getOptionsIni());
+
+	IniFile ini;
+	IniString inisectionname;
+	IniString line;
+	//while (!IsDebuggerPresent());
+	while (std::getline(sstr, line)) {
+		if (line.length() <= 1) {
+			continue;
+		}
+
+		if (line[0] == ';' || line[0] == '#') {
+			continue;
+		}
+
+		if (line.length() > 2) {
+			line = trimString(line);
+			if (line[0] == '[' && line[line.length() - 1] == ']') {
+				inisectionname = line.substr(1, line.length() - 2);
+				//tracef("ini [%s]\n", inisectionname.c_str());
+				continue;
+			}
+		}
+
+		if (inisectionname.empty()) {
+			continue;
+		}
+
+		size_t sizeidx = line.find('=');
+		if (sizeidx == IniString::npos) {
+			continue;
+		}
+
+		IniString key = trimString(line.substr(0, sizeidx));
+		IniString value = trimString(line.substr(sizeidx + 1));
+		if (value.length() > 1) {
+			if (value[0] == '"' && value[value.length() - 1] == '"') {
+				value = value.substr(1, value.length() - 2);
+			}
+		}
+
+		//tracef("ini '%s'='%s'\n", key.c_str(), value.c_str());
+		ini[inisectionname][key] = value;
+	}
+
+	return ini;
+}
+
 void OldPreGraphicsInitialisation()
 {
-	uint32 AppID = extOptGetReal("Steamworks", "AppID");
+	IniFile inifile = parseIniFromString();
+	uint32 AppID = static_cast<uint32>(std::stoul(inifile["Steamworks"]["AppID"]));
 
     // a game cannot have an invalid appid
     if (AppID == k_uAppIdInvalid)
@@ -62,7 +229,7 @@ void OldPreGraphicsInitialisation()
         return;
     }
 
-	bool debug = strncmp(extOptGetString("Steamworks", "Debug"), "Enabled", 7) == 0 ? true : isRunningFromIDE();
+	bool debug = (inifile["Steamworks"]["Debug"] == "Enabled")? true : (inifile["SteamworksIDE"]["IsRunningFromIDE"] == "True");
     
     if (debug)
     {
@@ -81,6 +248,7 @@ void OldPreGraphicsInitialisation()
             // do not return; from here as macOS doesn't really allow you to write to your own .app?
             // SteamAPI_Init() will fail if it really can't guess the app id and we should rely on that instead.
         }
+		steamAppIdTxt.close();
     }
     else
     {

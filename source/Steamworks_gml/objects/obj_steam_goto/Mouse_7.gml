@@ -1,3 +1,0 @@
-
-room_goto(targetRoom)
-

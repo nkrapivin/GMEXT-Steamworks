@@ -54,6 +54,11 @@ exit 0
     call %Utils% assertFileHashEquals %SDK_SOURCE% %SDK_HASH_WIN% %ERROR_SDK_HASH%
 
     echo "Copying Windows (64 bit) dependencies"
+	if "%YYtargetFile%"=="" (
+		echo "Running Windows project through IDE"
+		echo [SteamworksIDE]>>"%YYoutputFolder%\options.ini"
+		echo IsRunningFromIDE=True>>"%YYoutputFolder%\options.ini"
+	)
     if not exist "steam_api64.dll" call %Utils% itemCopyTo %SDK_SOURCE% "steam_api64.dll"
 
 exit /b 0
@@ -83,6 +88,11 @@ exit /b 0
     echo "Copying Linux (64 bit) dependencies"
     
     call %Utils% fileExtract "%YYprojectName%.zip" "_temp\"
+	if "%YYtargetFile%"=="" (
+		echo "Running Linux project through IDE"
+		echo [SteamworksIDE]>>"_temp\assets\options.ini"
+		echo IsRunningFromIDE=True>>"_temp\assets\options.ini"
+	)
     if not exist "_temp\assets\libsteam_api.so" (
         call %Utils% itemCopyTo %SDK_SOURCE% "_temp\assets\libsteam_api.so"
         call %Utils% folderCompress "_temp" "%YYprojectName%.zip"

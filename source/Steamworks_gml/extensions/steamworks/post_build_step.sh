@@ -16,6 +16,11 @@ setupmacOS() {
         logError "Extension is not compatible with the macOS VM export, please use YYC."
     else
         itemCopyTo "$SDK_SOURCE" "${YYprojectName}/${YYprojectName}/Supporting Files/libsteam_api.dylib"
+		if [[ -z "$YYtargetFile" ]]; then
+			echo "Running macOS YYC project through IDE"
+			echo '[SteamworksIDE]'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
+			echo 'IsRunningFromIDE=True'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
+		fi
     fi
 }
 
@@ -28,6 +33,11 @@ setupLinux() {
     
     fileExtract "${YYprojectName}.zip" "_temp"
     [[ ! -f "_temp/assets/libsteam_api.so" ]] && fileCopyTo "$SDK_SOURCE" "_temp/assets/libsteam_api.so"
+    if [[ -z "$YYtargetFile" ]]; then
+        echo "Running Linux project through IDE"
+		echo '[SteamworksIDE]'>>"_temp/assets/options.ini"
+		echo 'IsRunningFromIDE=True'>>"_temp/assets/options.ini"
+    fi
     folderCompress "_temp" "${YYprojectName}.zip"
     rm -r _temp
 }
