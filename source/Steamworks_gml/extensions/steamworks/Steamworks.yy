@@ -3,11 +3,6 @@
   "resourceVersion": "1.2",
   "name": "Steamworks",
   "ConfigValues": {},
-  "extensionVersion": "1.2.3",
-  "copyToTargets": 194,
-  "androidProps": false,
-  "iosProps": false,
-  "tvosProps": false,
   "optionsFile": "options.json",
   "options": [
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"__label1","extensionId":null,"guid":"fc7d5b5e-1344-49ee-bca6-8579b0c68d50","displayName":"","listItems":[],"description":"","defaultValue":"BUILD OPTIONS:","exportToINI":false,"hidden":false,"optType":5,},
@@ -34,6 +29,7 @@
   ],
   "exportToGame": true,
   "supportedTargets": 113497714299118,
+  "extensionVersion": "1.2.3",
   "packageId": "",
   "productId": "",
   "author": "",
@@ -41,6 +37,9 @@
   "license": "Proprietary",
   "description": "",
   "helpfile": "",
+  "iosProps": false,
+  "tvosProps": false,
+  "androidProps": false,
   "installdir": "",
   "files": [
     {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","filename":"Steamworks.dll","origname":"extensions\\Steamworks.dll","init":"steam_init","final":"","kind":4,"uncompress":false,"functions":[
@@ -1198,6 +1197,7 @@
   "tvosThirdPartyFrameworkEntries": [],
   "IncludedResources": [],
   "androidPermissions": [],
+  "copyToTargets": 194,
   "iosCocoaPods": "",
   "tvosCocoaPods": "",
   "iosCocoaPodDependencies": "",

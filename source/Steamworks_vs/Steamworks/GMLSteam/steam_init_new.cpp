@@ -12,6 +12,10 @@
 
 #include "DesktopExtensionTools.h"
 
+#if OS_MacOs
+#include <dlfcn.h>
+#endif
+
 int requestInd = 0;
 int getAsyncRequestInd()
 {
@@ -104,10 +108,8 @@ std::string getOptionsIni() {
 		CloseHandle(hFile);
 	}
 #else
-#ifdef __APPLE__
-	/* TODO: Implement macOS options.ini support here! */
-#else
 	Dl_info dlinf = { 0 };
+    /* this also seems to work on macOS... */
 	if (dladdr(reinterpret_cast<void*>(&getOptionsIni), &dlinf)) {
 		tracef(".so path is %s\n", dlinf.dli_fname);
 
@@ -134,7 +136,6 @@ std::string getOptionsIni() {
 			}
 		}
 	}
-#endif
 #endif
 	return optionsini;
 }

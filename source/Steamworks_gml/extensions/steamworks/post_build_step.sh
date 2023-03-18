@@ -13,7 +13,7 @@ setupmacOS() {
     
     echo "Copying macOS (64 bit) dependencies"
     if [[ "$YYTARGET_runtime" == "VM" ]]; then
-        logError "Extension is not compatible with the macOS VM export, please use YYC."
+        echo "Steamworks with VM export"
     else
         itemCopyTo "$SDK_SOURCE" "${YYprojectName}/${YYprojectName}/Supporting Files/libsteam_api.dylib"
 		if [[ -z "$YYtargetFile" ]]; then
