@@ -1,5 +1,5 @@
 #!/bin/bash
-export
+# export
 chmod +x "$(dirname "$0")/scriptUtils.sh"
 source "$(dirname "$0")/scriptUtils.sh"
 
