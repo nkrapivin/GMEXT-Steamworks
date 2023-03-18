@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export
 chmod +x "$(dirname "$0")/scriptUtils.sh"
 source "$(dirname "$0")/scriptUtils.sh"
 
@@ -13,7 +13,21 @@ setupmacOS() {
     
     echo "Copying macOS (64 bit) dependencies"
     if [[ "$YYTARGET_runtime" == "VM" ]]; then
-        echo "Steamworks with VM export"
+	echo "Steamworks with VM export"
+	rm "${YYoutputFolder}/libsteam_api.dylib"
+        itemCopyTo "$SDK_SOURCE" "${YYoutputFolder}/libsteam_api.dylib"
+	echo "Codesigning dylibs..."
+	codesign -f -s "${YYPLATFORM_option_mac_signing_identity}" --timestamp --options runtime "${YYoutputFolder}/libsteam_api.dylib"
+	codesign -f -s "${YYPLATFORM_option_mac_signing_identity}" --timestamp --options runtime "${YYoutputFolder}/libSteamworks.dylib"
+	YOYO_VM_APP="${YYruntimeLocation}/mac/YoYo Runner.app"
+	TMP_PLIST="/tmp/yysteamworks${RANDOM}.plist"
+        echo "VM YoYo Runner is in: ${YOYO_VM_APP}"
+	
+	echo "Writing entitlements plist from ${TMP_PLIST}"
+	PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>com.apple.security.cs.allow-dyld-environment-variables</key>\n    <true/>\n    <key>com.apple.security.cs.disable-library-validation</key>\n    <true/>\n</dict>\n</plist>"
+	echo -e "$PLIST">"${TMP_PLIST}"
+	codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --deep --timestamp --options runtime --entitlements "${TMP_PLIST}" "${YOYO_VM_APP}"
+	rm "${TMP_PLIST}"
     else
         itemCopyTo "$SDK_SOURCE" "${YYprojectName}/${YYprojectName}/Supporting Files/libsteam_api.dylib"
 		if [[ -z "$YYtargetFile" ]]; then
