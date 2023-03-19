@@ -5,6 +5,8 @@ source "$(dirname "$0")/scriptUtils.sh"
 
 # ######################################################################################
 # Script Functions
+# This entitlement plist allows Steamworks to load, and also allows audio input functions to work.
+PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>com.apple.security.cs.allow-dyld-environment-variables</key>\n    <true/>\n    <key>com.apple.security.cs.disable-library-validation</key>\n    <true/>\n    <key>com.apple.security.device.audio-input</key>\n    <true/>\n</dict>\n</plist>"
 
 setupmacOS() {
 
@@ -25,7 +27,6 @@ setupmacOS() {
 		echo "VM YoYo Runner is in: ${YOYO_VM_APP}"
 
 		echo "Writing entitlements plist from ${TMP_PLIST}"
-		PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>com.apple.security.cs.allow-dyld-environment-variables</key>\n    <true/>\n    <key>com.apple.security.cs.disable-library-validation</key>\n    <true/>\n</dict>\n</plist>"
 		echo -e "$PLIST">"${TMP_PLIST}"
 		codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --deep --timestamp --options runtime --entitlements "${TMP_PLIST}" "${YOYO_VM_APP}"
 		rm "${TMP_PLIST}"
@@ -40,6 +41,18 @@ setupmacOS() {
 		fi
     else
         itemCopyTo "$SDK_SOURCE" "${YYprojectName}/${YYprojectName}/Supporting Files/libsteam_api.dylib"
+	echo "Patching the Xcode project..."
+	echo -e "$PLIST">"${YYprojectName}/${YYprojectName}/Supporting Files/${YYprojectName}.entitlements"
+	# Enable hardened runtime
+	sed -i '' 's/				EXCLUDED_ARCHS = /				ENABLE_HARDENED_RUNTIME = YES;\n				EXCLUDED_ARCHS = /g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	# Force disable .Sandbox and .InAppPurchases
+	sed -i '' 's/						        enabled = 1;/						        enabled = 0;/g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	# Exclude StoreKit from the project
+	sed -i '' 's:		831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/ = {isa = PBXBuildFile; fileRef = 831BBFDB15C83806007085F8 /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:		831BBFDB15C83806007085F8 /\* StoreKit.framework \*/ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:				831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:				831BBFDB15C83806007085F8 /\* StoreKit.framework \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	echo "Xcode project patch done."
 		if [[ -z "$YYtargetFile" ]] || [[ "$YYtargetFile" == " " ]]; then
 			echo "Running macOS YYC project through IDE"
 			echo '[SteamworksIDE]'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
