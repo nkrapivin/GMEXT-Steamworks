@@ -232,6 +232,10 @@ void OldPreGraphicsInitialisation()
 
 	bool debug = (inifile["Steamworks"]["Debug"] == "Enabled")? true : (inifile["SteamworksIDE"]["IsRunningFromIDE"] == "True");
     
+#ifndef DEBUG
+    tracef("Library is built in release mode.\n");
+#endif
+    
     if (debug)
     {
         std::filesystem::path steamAppIdTxtPath = DesktopExtensionTools_getPathToExe();

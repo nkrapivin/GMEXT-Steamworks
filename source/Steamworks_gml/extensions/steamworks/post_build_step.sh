@@ -15,49 +15,50 @@ setupmacOS() {
     
     echo "Copying macOS (64 bit) dependencies"
     if [[ "$YYTARGET_runtime" == "VM" ]]; then
-		echo "Steamworks with VM export"
-		rm "${YYoutputFolder}/libsteam_api.dylib"
-		itemCopyTo "$SDK_SOURCE" "${YYoutputFolder}/libsteam_api.dylib"
-		
-		echo "Codesigning dylibs..."
-		codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --timestamp --options runtime "${YYoutputFolder}/libsteam_api.dylib"
-		codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --timestamp --options runtime "${YYoutputFolder}/libSteamworks.dylib"
-		YOYO_VM_APP="${YYruntimeLocation}/mac/YoYo Runner.app"
-		TMP_PLIST="/tmp/yysteamworks${RANDOM}.plist"
-		echo "VM YoYo Runner is in: ${YOYO_VM_APP}"
+	echo "Steamworks with VM export"
+	rm "${YYoutputFolder}/libsteam_api.dylib"
+	itemCopyTo "$SDK_SOURCE" "${YYoutputFolder}/libsteam_api.dylib"
+	
+	echo "Codesigning dylibs..."
+	codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --timestamp --options runtime "${YYoutputFolder}/libsteam_api.dylib"
+	codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --timestamp --options runtime "${YYoutputFolder}/libSteamworks.dylib"
+	YOYO_VM_APP="${YYruntimeLocation}/mac/YoYo Runner.app"
+	TMP_PLIST="/tmp/yysteamworks${RANDOM}.plist"
+	echo "VM YoYo Runner is in: ${YOYO_VM_APP}"
 
-		echo "Writing entitlements plist from ${TMP_PLIST}"
-		echo -e "$PLIST">"${TMP_PLIST}"
-		codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --deep --timestamp --options runtime --entitlements "${TMP_PLIST}" "${YOYO_VM_APP}"
-		rm "${TMP_PLIST}"
+	echo "Writing entitlements plist from ${TMP_PLIST}"
+	echo -e "$PLIST">"${TMP_PLIST}"
+	codesign -s "${YYPLATFORM_option_mac_signing_identity}" -f --deep --timestamp --options runtime --entitlements "${TMP_PLIST}" "${YOYO_VM_APP}"
+	rm "${TMP_PLIST}"
 
-		if [[ -z "$YYtargetFile" ]] || [[ "$YYtargetFile" == " " ]]; then
-			echo "Running macOS VM project through IDE"
-			echo '[SteamworksIDE]'>>"${YYoutputFolder}/options.ini"
-			echo 'IsRunningFromIDE=True'>>"${YYoutputFolder}/options.ini"
-		else
-			echo "Building a macOS VM project as file"
-			echo "YYtargetFile: ${YYtargetFile}"
-		fi
+	if [[ -z "$YYtargetFile" ]] || [[ "$YYtargetFile" == " " ]]; then
+		echo "Running macOS VM project through IDE"
+		echo '[SteamworksIDE]'>>"${YYoutputFolder}/options.ini"
+		echo 'IsRunningFromIDE=True'>>"${YYoutputFolder}/options.ini"
+	else
+		echo "Building a macOS VM project as file"
+		echo "YYtargetFile: ${YYtargetFile}"
+		logError "Building in VM Create Executable requires patches to the Application Oven!"
+	fi
     else
         itemCopyTo "$SDK_SOURCE" "${YYprojectName}/${YYprojectName}/Supporting Files/libsteam_api.dylib"
-		echo "Patching the Xcode project..."
-		echo -e "$PLIST">"${YYprojectName}/${YYprojectName}/Supporting Files/${YYprojectName}.entitlements"
-		# Enable hardened runtime
-		sed -i '' 's/				EXCLUDED_ARCHS = /				ENABLE_HARDENED_RUNTIME = YES;\n				EXCLUDED_ARCHS = /g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		# Force disable .Sandbox and .InAppPurchases
-		sed -i '' 's/						        enabled = 1;/						        enabled = 0;/g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		# Exclude StoreKit from the project
-		sed -i '' 's:		831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/ = {isa = PBXBuildFile; fileRef = 831BBFDB15C83806007085F8 /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		sed -i '' 's:		831BBFDB15C83806007085F8 /\* StoreKit.framework \*/ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		sed -i '' 's:				831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		sed -i '' 's:				831BBFDB15C83806007085F8 /\* StoreKit.framework \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
-		echo "Xcode project patch done."
-		if [[ -z "$YYtargetFile" ]] || [[ "$YYtargetFile" == " " ]]; then
-			echo "Running macOS YYC project through IDE"
-			echo '[SteamworksIDE]'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
-			echo 'IsRunningFromIDE=True'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
-		fi
+	echo "Patching the Xcode project..."
+	echo -e "$PLIST">"${YYprojectName}/${YYprojectName}/Supporting Files/${YYprojectName}.entitlements"
+	# Enable hardened runtime
+	sed -i '' 's/				EXCLUDED_ARCHS = /				ENABLE_HARDENED_RUNTIME = YES;\n				EXCLUDED_ARCHS = /g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	# Force disable .Sandbox and .InAppPurchases
+	sed -i '' 's/						        enabled = 1;/						        enabled = 0;/g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	# Exclude StoreKit from the project
+	sed -i '' 's:		831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/ = {isa = PBXBuildFile; fileRef = 831BBFDB15C83806007085F8 /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:		831BBFDB15C83806007085F8 /\* StoreKit.framework \*/ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:				831BBFDC15C83806007085F8 /\* StoreKit.framework in Frameworks \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	sed -i '' 's:				831BBFDB15C83806007085F8 /\* StoreKit.framework \*/,::g' "${YYprojectName}/${YYprojectName}.xcodeproj/project.pbxproj"
+	echo "Xcode project patch done."
+	if [[ -z "$YYtargetFile" ]] || [[ "$YYtargetFile" == " " ]]; then
+		echo "Running macOS YYC project through IDE"
+		echo '[SteamworksIDE]'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
+		echo 'IsRunningFromIDE=True'>>"${YYprojectName}/${YYprojectName}/Supporting Files/options.ini"
+	fi
     fi
 }
 
