@@ -2,6 +2,8 @@
 
 # RU:
 
+# РЕЛИЗ ДЛЯ VK PLAY [ЗДЕСЬ](https://github.com/nkrapivin/GMEXT-Steamworks/releases/tag/v1.1.4vk)
+
 Репозиторий для официального расширения Steamworks от YoYoGames Ltd. (авторов GameMaker), но с поддержкой VK Play.
 
 Работает только на `GameMaker 2022.9` (он же `GameMaker-LTS 2022.0`) или новее.
