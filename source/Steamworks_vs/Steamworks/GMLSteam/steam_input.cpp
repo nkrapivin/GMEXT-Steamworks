@@ -73,9 +73,9 @@ public:
 
 	STEAM_CALLBACK(CGMSteamInputCallbacks, on_steam_input_device_disconnected, SteamInputDeviceDisconnected_t);
 
-	/*SDK1.57:
+	///*SDK1.57:
 	STEAM_CALLBACK(CGMSteamInputCallbacks, on_steam_input_gamepad_slot_change, SteamInputGamepadSlotChange_t);
-	*/
+	//*/
 
 	static void on_steam_input_action_event(SteamInputActionEvent_t* pParam);
 };
@@ -139,7 +139,7 @@ void CGMSteamInputCallbacks::on_steam_input_action_event(SteamInputActionEvent_t
 	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
 }
 
-/*SDK1.57:
+///*SDK1.57:
 void CGMSteamInputCallbacks::on_steam_input_gamepad_slot_change(SteamInputGamepadSlotChange_t* pParam)
 {
 	int map = CreateDsMap(0,0);
@@ -156,7 +156,7 @@ void CGMSteamInputCallbacks::on_steam_input_gamepad_slot_change(SteamInputGamepa
 	DsMapAddDouble(map, "new_gamepad_slot", pParam->m_nNewGamepadSlot);
 	CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
 }
-*/
+//*/
 
 // only instantiate this class if we've called SteamInput->Init()
 // and we actually want native Steam Input,

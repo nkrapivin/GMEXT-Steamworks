@@ -165,15 +165,15 @@ public:
         }
     }
 
-    /*SDK1.57:
+    ///*SDK1.57:
     STEAM_CALLBACK(CGMAuthTicketCallbacks, OnGetTicketForWebApiResponse, GetTicketForWebApiResponse_t);
-    */
+    //*/
     STEAM_CALLBACK(CGMAuthTicketCallbacks, OnGetAuthSessionTicketResponse, GetAuthSessionTicketResponse_t);
 };
 
 CGMAuthTicketCallbacks *CGMAuthTicketCallbacks::m_pAuthTicketCallbacks = nullptr;
 
-/*SDK1.57:
+///*SDK1.57:
 void CGMAuthTicketCallbacks::OnGetTicketForWebApiResponse(GetTicketForWebApiResponse_t* pParam)
 {
     int map = CreateDsMap(0,0);
@@ -194,7 +194,7 @@ void CGMAuthTicketCallbacks::OnGetTicketForWebApiResponse(GetTicketForWebApiResp
         CreateAsyncEventWithDSMap(map, EVENT_OTHER_WEB_STEAM);
     }
 }
-*/
+//*/
 
 void CGMAuthTicketCallbacks::OnGetAuthSessionTicketResponse(GetAuthSessionTicketResponse_t* pParam)
 {
@@ -211,7 +211,7 @@ YYEXPORT void steam_user_get_auth_session_ticket(RValue& Result, CInstance* self
 {
     CGMAuthTicketCallbacks::Ensure();
 
-    /*SDK1.57:
+    ///*SDK1.57:
     const char *pchIdentity = nullptr;
     if (argc > 0 && arg && arg[0].kind == VALUE_STRING)
     {
@@ -223,8 +223,8 @@ YYEXPORT void steam_user_get_auth_session_ticket(RValue& Result, CInstance* self
     Result.kind = VALUE_REAL;
     Result.val = static_cast<double>(authTicket);
     return;
-    */
-
+    //*/
+/*
     uint8 ticketBytes[3000] = { '\0' };
     uint32 ticketSize = 0;
 
@@ -239,7 +239,7 @@ YYEXPORT void steam_user_get_auth_session_ticket(RValue& Result, CInstance* self
         int ticketBuffer = CreateBuffer(ticketSize, eBuffer_Format_Fixed, 1);
         BufferWriteContent(ticketBuffer, 0, ticketBytes, ticketSize);
         Result.val = ticketBuffer;
-    }
+    }*/
 }
 
 YYEXPORT void steam_user_cancel_auth_ticket(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)

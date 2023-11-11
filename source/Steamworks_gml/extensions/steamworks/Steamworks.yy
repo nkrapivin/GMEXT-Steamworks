@@ -17,7 +17,7 @@
   "date": "2019-12-12T01:34:29",
   "description": "",
   "exportToGame": true,
-  "extensionVersion": "1.5.1",
+  "extensionVersion": "1.5.2",
   "files": [
     {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","constants":[
         {"resourceType":"GMExtensionConstant","resourceVersion":"1.0","name":"ov_friends","hidden":false,"value":"0",},
@@ -1179,7 +1179,7 @@
   "macsourcedir": "",
   "options": [
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"__label1","defaultValue":"BUILD OPTIONS:","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"fc7d5b5e-1344-49ee-bca6-8579b0c68d50","hidden":false,"listItems":[],"optType":5,},
-    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkPath","defaultValue":"","description":"The path to the steam sdk (v1.55)","displayName":"Steam SDK","exportToINI":false,"extensionId":null,"guid":"2d6a1c61-98e7-4289-8eff-d70ef6dac1ff","hidden":false,"listItems":[],"optType":4,},
+    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkPath","defaultValue":"","description":"The path to the steam sdk (v1.58a)","displayName":"Steam SDK","exportToINI":false,"extensionId":null,"guid":"2d6a1c61-98e7-4289-8eff-d70ef6dac1ff","hidden":false,"listItems":[],"optType":4,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"__label2","defaultValue":"APP OPTIONS:","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"c37a2e1d-c82f-4d90-9d0a-b4a2b3b3da08","hidden":false,"listItems":[],"optType":5,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"appID","defaultValue":"480","description":"Get this value from your steam dashboard.","displayName":"Application ID","exportToINI":false,"extensionId":null,"guid":"2d512363-a8c0-4025-8b9f-b53e231b025d","hidden":false,"listItems":[],"optType":1,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"debug","defaultValue":"Auto","description":"Auto - automatically sets debug to false on export;\nEnabled - will always keep debug mode on (USE AT OWN RISK);","displayName":"Debug","exportToINI":true,"extensionId":null,"guid":"96a61e5d-c4ac-4104-b5ac-c8ef936e2609","hidden":false,"listItems":[
@@ -1192,10 +1192,10 @@
         "1",
         "2",
       ],"optType":6,},
-    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkVersion","defaultValue":"1.55","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"3c048609-3c36-48e2-88c3-d1c216e84e6b","hidden":true,"listItems":[],"optType":2,},
-    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashWin","defaultValue":"1DB3FD414039D3E5815A5721925DD2E0A3A9F2549603C6CAB7C49B84966A1AF3","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"33aac3da-b966-4c5f-8c9a-f3835e1e003d","hidden":true,"listItems":[],"optType":2,},
-    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashMac","defaultValue":"88DC79403F68E81B6674C927ED362EF3CF69046F587ED009FDC6AD85D85E97F2","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"16d61f9e-45d0-40f7-9efd-c932ad7ed8ba","hidden":true,"listItems":[],"optType":2,},
-    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashLinux","defaultValue":"C0CC3D2802E5F2463BFA0046C41D2F65A6335BAAEEFBBA6C7DBD5681D5CA7C46","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"f1101d61-b736-4c04-ad9a-f798fac10055","hidden":true,"listItems":[],"optType":2,},
+    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkVersion","defaultValue":"1.58a","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"3c048609-3c36-48e2-88c3-d1c216e84e6b","hidden":true,"listItems":[],"optType":2,},
+    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashWin","defaultValue":"DCFAA13AA419A0641917205957DBE15AA472E7CF09A28CF8D3CF429598E67799","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"33aac3da-b966-4c5f-8c9a-f3835e1e003d","hidden":true,"listItems":[],"optType":2,},
+    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashMac","defaultValue":"363AB50CE9BF4680D8DDB8C6142E566854803F831769FAB0428867B9994D0520","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"16d61f9e-45d0-40f7-9efd-c932ad7ed8ba","hidden":true,"listItems":[],"optType":2,},
+    {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"sdkHashLinux","defaultValue":"B50B9D313EB554792216762F5CC0B972CFAE14149F720440E0F0D6C4563C951F","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"f1101d61-b736-4c04-ad9a-f798fac10055","hidden":true,"listItems":[],"optType":2,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"versionStable","defaultValue":"2023.1.0.0","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"377d973f-31ca-4355-aba6-217f0172aae8","hidden":true,"listItems":[],"optType":2,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"versionBeta","defaultValue":"2023.100.0.0","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"f070764a-195d-45ff-b522-1e3f22cba09c","hidden":true,"listItems":[],"optType":2,},
     {"resourceType":"GMExtensionOption","resourceVersion":"1.0","name":"versionDev","defaultValue":"9.9.1.293","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"a675bafd-d65f-4f79-97c5-3f65e3e15551","hidden":true,"listItems":[],"optType":2,},
