@@ -37,7 +37,7 @@ YYEXPORT void steam_update(RValue& Result, CInstance* selfinst, CInstance* other
 
 bool steam_is_initialised = false;
 
-CSteamAPIContext* g_SteamContext;
+//CSteamAPIContext* g_SteamContext;
 YYEXPORT void steam_init(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)//(int appid)
 {
 	if (!steam_is_initialised)
