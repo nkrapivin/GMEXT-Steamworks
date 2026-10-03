@@ -44,6 +44,20 @@ YYEXPORT void /*uint64*/ steam_get_user_steam_id(RValue& Result, CInstance* self
 	Result.v64 = SteamUser()->GetSteamID().ConvertToUint64();
 }
 
+///	\brief	Returns a 64bit Steam Owner ID
+YYEXPORT void /*uint64*/ steam_get_owner_steam_id(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)//()/*Steam_User_GetSteamID*/
+{
+	if (!steam_is_initialised)
+	{
+		Result.kind = VALUE_INT64;
+		Result.v64 = 0;
+		return;
+	}
+
+	Result.kind = VALUE_INT64;
+	Result.v64 = SteamApps()->GetAppOwner().ConvertToUint64();
+}
+
 //returns a 32bit account Id
 YYEXPORT void /*double*/ steam_get_user_account_id(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)//()/*Steam_User_GetAccountID*/
 {

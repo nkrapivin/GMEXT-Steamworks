@@ -245,3 +245,9 @@ YYEXPORT void steam_utils_get_steam_ui_language(RValue& Result, CInstance* selfi
 {
 	YYCreateString(&Result, (steam_is_initialised && SteamUtils()) ? SteamUtils()->GetSteamUILanguage() : "");
 }
+
+/// ()->string
+YYEXPORT void steam_utils_get_ip_country(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)
+{
+	YYCreateString(&Result, (steam_is_initialised && SteamUtils()) ? SteamUtils()->GetIPCountry() : "");
+}

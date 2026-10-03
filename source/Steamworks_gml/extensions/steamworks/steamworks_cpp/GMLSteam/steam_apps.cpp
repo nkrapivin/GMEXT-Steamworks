@@ -141,3 +141,9 @@ YYEXPORT void steam_set_active_beta(RValue& Result, CInstance* selfinst, CInstan
     Result.val = success;
 }
 
+/// ()->real
+YYEXPORT void steam_get_app_build_id(RValue& Result, CInstance* selfinst, CInstance* otherinst, int argc, RValue* arg)
+{
+	Result.kind = VALUE_REAL;
+	Result.val = (steam_is_initialised && SteamApps()) ? SteamApps()->GetAppBuildId() : -1;
+}

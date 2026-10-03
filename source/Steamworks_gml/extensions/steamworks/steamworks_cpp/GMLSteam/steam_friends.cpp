@@ -74,7 +74,7 @@ protected:
 			m_bOverlayActivated = false;
 			DebugConsoleOutput("[SINGLETON] Steam overlay now inactive\n");
 #ifdef OS_Windows
-			BringWindowToFront();
+			//BringWindowToFront();
 #endif
 		}
 		int map = CreateDsMap(0, 0);
